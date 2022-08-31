@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ax50ch" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.2.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:process id="processError" name="Error Process" isExecutable="true">
+    <bpmn:extensionElements />
+    <bpmn:startEvent id="start" name="start">
+      <bpmn:outgoing>flowStart</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="flowStart" sourceRef="start" targetRef="taskA" />
+    <bpmn:sequenceFlow id="errorFlow" sourceRef="taskA" targetRef="taskB" />
+    <bpmn:endEvent id="endB" name="end B">
+      <bpmn:incoming>flowB</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="flowB" sourceRef="taskB" targetRef="endB" />
+    <bpmn:endEvent id="endA" name="end A">
+      <bpmn:incoming>flowA</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="flowA" sourceRef="taskA" targetRef="endA" />
+    <bpmn:boundaryEvent id="errorEvent" attachedToRef="taskA">
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1uct2rx" />
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="taskA" name="Task A">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="${environment.services.getRequest}" retries="serviceResult" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>flowStart</bpmn:incoming>
+      <bpmn:outgoing>errorFlow</bpmn:outgoing>
+      <bpmn:outgoing>flowA</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="taskB" name="TaskB">
+      <bpmn:extensionElements />
+      <bpmn:incoming>errorFlow</bpmn:incoming>
+      <bpmn:outgoing>flowB</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmn:error id="Error_1epazsq" />
+  <bpmn:error id="Error_140enkx" />
+  <bpmn:error id="Error_06fsxfo" name="error" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="processError">
+      <bpmndi:BPMNEdge id="Flow_1d5lxr8_di" bpmnElement="flowA">
+        <di:waypoint x="400" y="297" />
+        <di:waypoint x="492" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_078wa7t_di" bpmnElement="flowB">
+        <di:waypoint x="400" y="120" />
+        <di:waypoint x="492" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_129emi0_di" bpmnElement="errorFlow">
+        <di:waypoint x="350" y="257" />
+        <di:waypoint x="350" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_123nhc0_di" bpmnElement="flowStart">
+        <di:waypoint x="215" y="297" />
+        <di:waypoint x="300" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start">
+        <dc:Bounds x="179" y="279" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="322" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_118bbqn_di" bpmnElement="endB">
+        <dc:Bounds x="492" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="496" y="145" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0a9o6ya_di" bpmnElement="endA">
+        <dc:Bounds x="492" y="279" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="496" y="322" width="29" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1udsrgb_di" bpmnElement="taskA">
+        <dc:Bounds x="300" y="257" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0fm0hlq_di" bpmnElement="taskB">
+        <dc:Bounds x="300" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0g6c4o8_di" bpmnElement="errorEvent">
+        <dc:Bounds x="332" y="239" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

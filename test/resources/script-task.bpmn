@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0dnnxh9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.2.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:process id="theProcess" isExecutable="true">
+    <bpmn:startEvent id="theStart" name="Start">
+      <bpmn:outgoing>flow1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="flow1" sourceRef="theStart" targetRef="scriptTask" />
+    <bpmn:scriptTask id="scriptTask" name="Script" scriptFormat="Javascript" camunda:resultVariable="result">
+      <bpmn:incoming>flow1</bpmn:incoming>
+      <bpmn:outgoing>flow2</bpmn:outgoing>
+      <bpmn:script>const self = this;
+        const getJson = self.environment.services.get;
+        const set = self.environment.services.set;
+        getJson(self.environment.variables.apiPath).then((result) =&gt; {
+          self.environment.output.statusCode = 200;
+          self.environment.output.result = result;
+          set(self, 'statusCode', 200)
+          next(null, {result});
+        }).catch((err) =&gt; {
+          set(self, 'statusCode', err.statusCode);
+          self.environment.output.statusCode = err.statusCode;
+          next();
+        });</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="theEnd" name="End">
+      <bpmn:extensionElements />
+      <bpmn:incoming>flow2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="flow2" sourceRef="scriptTask" targetRef="theEnd" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="theProcess">
+      <bpmndi:BPMNEdge id="Flow_0pz9y2k_di" bpmnElement="flow2">
+        <di:waypoint x="380" y="80" />
+        <di:waypoint x="432" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15su5gh_di" bpmnElement="flow1">
+        <di:waypoint x="228" y="80" />
+        <di:waypoint x="280" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0q3ayah_di" bpmnElement="theStart">
+        <dc:Bounds x="192" y="62" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="198" y="105" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0za6p7z_di" bpmnElement="scriptTask">
+        <dc:Bounds x="280" y="40" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_150affs_di" bpmnElement="theEnd">
+        <dc:Bounds x="432" y="62" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="440" y="105" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

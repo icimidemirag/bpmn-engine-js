@@ -1,0 +1,31 @@
+{
+  "components": [
+    {
+      "label": "Ürün adı",
+      "type": "textfield",
+      "id": "Field_1t8s886",
+      "key": "ad",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Ürün miktarı",
+      "type": "number",
+      "id": "Field_0n4zjmq",
+      "key": "miktar",
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "form",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.2.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.17.0",
+  "schemaVersion": 4
+}

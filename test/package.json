@@ -1,0 +1,18 @@
+{
+  "name": "bpmn-engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bent": "^7.3.12",
+    "bpmn-engine": "^15.0.0",
+    "bpmn-engine-extensions": "^1.1.1",
+    "camunda-bpmn-moddle": "^6.1.2",
+    "uuid": "^8.3.2"
+  }
+}
