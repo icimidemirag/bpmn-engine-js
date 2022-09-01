@@ -1,9 +1,11 @@
 const express = require("express");
+const cors = require("cors")
 const { Engine } = require("bpmn-engine");
 const { EventEmitter } = require("events");
 const fs = require("fs");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 var state = null;
@@ -25,6 +27,9 @@ function camundaExt(activity) {
 }
 
 app.post("/start", (req, res) => {
+  if(state){
+    return res.json({started: true});
+  }
   const engine = new Engine({
     name: "onay example",
     source: fs.readFileSync("./onay.bpmn"),
@@ -40,7 +45,7 @@ app.post("/start", (req, res) => {
 
   listener.on("wait", (api, deneme) => {
     state = deneme.getState();
-    res.json({ state });
+    res.json({started: true});
   });
 
   engine.execute({
@@ -53,7 +58,7 @@ app.post("/start", (req, res) => {
 
 app.get("/isFinished", (req, res) => {
   if (state === null) {
-    return res.json({ message: "No state" });
+    return res.json({started: false});
   }
   const engine = new Engine({
     name: "onay example",
@@ -68,6 +73,10 @@ app.get("/isFinished", (req, res) => {
   const listener = new EventEmitter();
   listener.on("wait", (elementApi, engineApi) => {
     if (elementApi.environment.variables.isNotAprroved) {
+      console.log(elementApi.environment.variables);
+      if(elementApi.environment.variables.message){
+        res.json({ isFinished: false,message: elementApi.environment.variables.message });
+      }
       res.json({ isFinished: false });
     }
     else{
@@ -90,7 +99,7 @@ app.get("/isFinished", (req, res) => {
 
 app.get("/getNumber", (req, res) => {
   if (state === null) {
-    return res.json({ message: "No state" });
+    return res.json({started: false});
   }
   const engine = new Engine({
     name: "onay example",
@@ -108,7 +117,7 @@ app.get("/getNumber", (req, res) => {
       res.json({ form: engineApi.environment.output.form });
     }
     else{
-      res.json({ form: null });
+      res.json({ isNotForm: true });
     }
   });
   engine.resume({
@@ -121,7 +130,7 @@ app.get("/getNumber", (req, res) => {
 
 app.post("/sendNumber", async (req, res) => {
   if (state === null) {
-    return res.json({ message: "No state" });
+    return res.json({started: false});
   }
   const engine = new Engine({
     name: "onay example",
@@ -162,7 +171,7 @@ app.post("/sendNumber", async (req, res) => {
 
 app.post("/approval", (req, res) => {
   if (state === null) {
-    return res.json({ message: "No state" });
+    return res.json({started: false});
   }
   const engine = new Engine({
     name: "onay example",
@@ -178,12 +187,15 @@ app.post("/approval", (req, res) => {
   listener.on("wait", (elementApi, engineApi) => {
     if (elementApi.id === "approval") {
       if (engineApi.environment.output.form) {
+        if(req.body.isNotAprroved){
+          elementApi.environment.variables.message = req.body.message
+        }
         elementApi.environment.variables.isNotAprroved = req.body.isNotAprroved
         state = engineApi.getState();
-        res.json(elementApi.environment.variables.isNotAprroved);
+        res.json({isNotAprroved:elementApi.environment.variables.isNotAprroved});
       }
       else{
-        res.json({ message: "No form" });
+        res.json({ isNotForm: true });
       }
     }
     elementApi.signal();
@@ -196,7 +208,7 @@ app.post("/approval", (req, res) => {
   });
 });
 
-const port = 3000;
+const port = 4000;
 app.listen(port, () => {
   console.log(`Sunucu ${port} portunda başlatıldı..`);
 });

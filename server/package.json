@@ -2,6 +2,7 @@
   "dependencies": {
     "bpmn-engine": "^15.0.0",
     "camunda-bpmn-moddle": "^7.0.1",
+    "cors": "^2.8.5",
     "express": "^4.18.1"
   },
   "name": "server",
