@@ -36,7 +36,7 @@ listener.on('activity.end', (api,deneme) => {
     // console.log(api.environment.options);
     // console.log(`<${api.id}> ye geldi`)
   };
-  // if (api.id === 'karar') console.log(`<${api.id}> ye geldi`);
+  if (api.id === 'karar') console.log(`<${api.id}> ye geldi`);
 });
 
 
