@@ -1,14 +1,21 @@
 const express = require("express");
 const cors = require("cors")
+const mongoose = require('mongoose');
 const { Engine } = require("bpmn-engine");
 const { EventEmitter } = require("events");
 const fs = require("fs");
+const State = require("./models/State");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 var state = null;
+
+//Connect DB
+mongoose.connect('mongodb://localhost/onay-db').then(() => {
+    console.log("DB connected successfully");
+});
 
 function camundaExt(activity) {
   if (!activity.behaviour.extensionElements) return;
@@ -27,11 +34,11 @@ function camundaExt(activity) {
 }
 
 app.post("/start", (req, res) => {
-  if(state){
-    return res.json({started: true});
-  }
+  // if(state){
+  //   return res.json({started: true});
+  // }
   const engine = new Engine({
-    name: "onay example",
+    name: "onay example 1",
     source: fs.readFileSync("./onay.bpmn"),
     moddleOptions: {
       camunda: require("camunda-bpmn-moddle/resources/camunda.json"),
@@ -43,9 +50,11 @@ app.post("/start", (req, res) => {
 
   const listener = new EventEmitter();
 
-  listener.on("wait", (api, deneme) => {
+  listener.on("wait", async (api, deneme) => {
     state = deneme.getState();
-    res.json({started: true});
+    // console.log(state);
+    await State.create(state);
+    res.json({started: true, state: state});
   });
 
   engine.execute({
@@ -60,8 +69,11 @@ app.get("/isFinished", (req, res) => {
   if (state === null) {
     return res.json({started: false});
   }
+
+  console.log(state);
+
   const engine = new Engine({
-    name: "onay example",
+    name: "onay example 1",
     source: fs.readFileSync("./onay.bpmn"),
     moddleOptions: {
       camunda: require("camunda-bpmn-moddle/resources/camunda.json"),
@@ -84,7 +96,8 @@ app.get("/isFinished", (req, res) => {
     }
     elementApi.signal();
   });
-  engine.on("end", (elementApi,engineApi) => {
+  engine.on("end", async (elementApi,engineApi) => {
+    await State.findOneAndDelete({name: state.name});
     state = null;
     console.log("completed");
     res.json({ isFinished: true });
@@ -97,12 +110,16 @@ app.get("/isFinished", (req, res) => {
   });
 });
 
-app.get("/getNumber", (req, res) => {
+app.get("/getNumber", async (req, res) => {
+  state = await State.findOne({ name: "onay example 1" });
   if (state === null) {
     return res.json({started: false});
   }
+
+  console.log(state);
+
   const engine = new Engine({
-    name: "onay example",
+    name: "onay example 1",
     source: fs.readFileSync("./onay.bpmn"),
     moddleOptions: {
       camunda: require("camunda-bpmn-moddle/resources/camunda.json"),
@@ -126,14 +143,19 @@ app.get("/getNumber", (req, res) => {
       isNotAprroved: true,
     },
   });
+  await State.findOneAndUpdate({ name: "onay example 1" }, state);
 });
 
 app.post("/sendNumber", async (req, res) => {
+  state = await State.findOne({ name: "onay example 1" });
   if (state === null) {
     return res.json({started: false});
   }
+
+  console.log(state);
+
   const engine = new Engine({
-    name: "onay example",
+    name: "onay example 1",
     source: fs.readFileSync("./onay.bpmn"),
     moddleOptions: {
       camunda: require("camunda-bpmn-moddle/resources/camunda.json"),
@@ -167,14 +189,18 @@ app.post("/sendNumber", async (req, res) => {
       isNotAprroved: true,
     },
   });
+  await State.findOneAndUpdate({ name: "onay example 1" }, state);
 });
 
-app.post("/approval", (req, res) => {
+app.post("/approval",  async(req, res) => {
   if (state === null) {
     return res.json({started: false});
   }
+
+  console.log(state);
+
   const engine = new Engine({
-    name: "onay example",
+    name: "onay example 1",
     source: fs.readFileSync("./onay.bpmn"),
     moddleOptions: {
       camunda: require("camunda-bpmn-moddle/resources/camunda.json"),
@@ -206,6 +232,7 @@ app.post("/approval", (req, res) => {
       isNotAprroved: true,
     },
   });
+  await State.findOneAndUpdate({ name: "onay example 1" }, state);
 });
 
 const port = 4000;
